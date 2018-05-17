@@ -46,6 +46,13 @@ ReplicaAddress::ReplicaAddress(const string &host, const string &port)
 
 }
 
+ReplicaAddress::ReplicaAddress(const string &host, const string &port,
+		const uint8_t mac[]) : host(host), port(port) {
+    for (int i = 0; i < ETH_ALEN; i++) {
+	this->mac[i] = mac[i];
+    }
+}
+
 bool
 ReplicaAddress::operator==(const ReplicaAddress &other) const {
     return ((host == other.host) &&
@@ -155,13 +162,19 @@ Configuration::Configuration(std::ifstream &file)
             }
 
             char *host = strtok(arg, ":");
-            char *port = strtok(NULL, "");
+            char *port = strtok(NULL, ",");
+	    char *mac_str = strtok(NULL, "");
+	    uint8_t mac[ETH_ALEN];
+	    if (scanf(mac_str, "%02x:%02x:%02x:%02x:%02x:%02x",
+			    &mac[0], &mac[1], &mac[2], &mac[3], &mac[4], &mac[5]) != 6) {
+		    Panic("Invalid mac address for replica");
+	    }
 
             if (!host || !port) {
-                Panic("Configuration line format: 'replica group host:port'");
+                Panic("Configuration line format: 'replica group host:port,mac'");
             }
 
-            replicas[group].push_back(ReplicaAddress(string(host), string(port)));
+            replicas[group].push_back(ReplicaAddress(string(host), string(port), mac));
         } else if (strcasecmp(cmd, "multicast") == 0) {
             char *arg = strtok(NULL, " \t");
             if (!arg) {

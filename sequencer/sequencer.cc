@@ -135,11 +135,15 @@ Transport::Transport(Sequencer *sequencer, Configuration *config)
     }
 
     /* Sequencer sends out packets using multicast */
-    this->destSockAddr.sll_ifindex = ifopts.ifr_ifindex;
-    this->destSockAddr.sll_halen = ETH_ALEN;
-    for (int i = 0; i < ETH_ALEN; i++) {
-        this->destSockAddr.sll_addr[i] = 0xFF;
-    }
+    /*for (int i = 0; i < config->g; i++) {
+	for (int j = 0; j < config->n; j++) {
+	    ReplicaAddress replica = config->replica(i, j);
+	    int index = (i * config->n) + j;
+	    this->destSockAddrs[index].sll_ifindex = ifopts.ifr_ifindex;
+	    this->destSockAddrs[index].sll_halen = ETH_ALEN;
+	    this->destSockAddr[index].sll_addr = replica.mac;
+	}
+    }*/
 }
 
 Transport::~Transport() {
@@ -167,7 +171,7 @@ Transport::Run() {
 
         if (ProcessPacket(buffer, n)) {
             if (sendto(this->sockfd, buffer, n, 0,
-                       (struct sockaddr*)&this->destSockAddr,
+                       (struct sockaddr*)&this->destSockAddrs[0], // TODO: fix!!!
                        sizeof(struct sockaddr_ll)) < 0) {
                 Warning("Failed to send packet");
             }

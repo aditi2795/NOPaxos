@@ -35,6 +35,7 @@
 #include "lib/viewstamp.h"
 
 #include <fstream>
+#include <netinet/if_ether.h>
 #include <stdbool.h>
 #include <string>
 #include <vector>
@@ -48,7 +49,10 @@ struct ReplicaAddress
 {
     string host;
     string port;
+    uint8_t mac[ETH_ALEN];
     ReplicaAddress(const string &host, const string &port);
+    ReplicaAddress(const string &host, const string &port,
+		const uint8_t mac[]);
     bool operator==(const ReplicaAddress &other) const;
     inline bool operator!=(const ReplicaAddress &other) const {
         return !(*this == other);

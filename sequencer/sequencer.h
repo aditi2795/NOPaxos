@@ -86,7 +86,7 @@ private:
     Sequencer *sequencer;
     Configuration *config;
     int sockfd;
-    struct sockaddr_ll destSockAddr;
+    struct sockaddr_ll destSockAddrs[];
 
     bool ProcessPacket(uint8_t *packet, size_t len);
 };
