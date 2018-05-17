@@ -178,7 +178,7 @@ Transport::Run() {
 bool
 Transport::ProcessPacket(uint8_t *packet, size_t len)
 {
-    struct ether_header *eh;
+    //struct ether_header *eh;
     struct iphdr *iph;
     struct udphdr *udph;
     struct sockaddr_storage saddr;
@@ -190,7 +190,7 @@ Transport::ProcessPacket(uint8_t *packet, size_t len)
         return false;
     }
 
-    eh = (struct ether_header *)packet;
+    //eh = (struct ether_header *)packet;
     iph = (struct iphdr *)(packet
                            + sizeof(struct ether_header));
     udph = (struct udphdr *)(packet
@@ -205,11 +205,12 @@ Transport::ProcessPacket(uint8_t *packet, size_t len)
      * Check ethernet destination is FF:FF:FF:FF:FF:FF,
      * and IP destination is the group multicast address.
      */
-    for (int i = 0; i < ETH_ALEN; i++) {
-        if (eh->ether_dhost[i] != 0xFF) {
-            return false;
-        }
-    }
+    //for (int i = 0; i < ETH_ALEN; i++) {
+        // Remove checks for multicast
+	//if (eh->ether_dhost[i] != 0xFF) {
+        //    return false;
+        //}
+    //}
 
     ((struct sockaddr_in *)&saddr)->sin_addr.s_addr = iph->daddr;
     inet_ntop(AF_INET, &((struct sockaddr_in *)&saddr)->sin_addr, destip, sizeof(destip));
