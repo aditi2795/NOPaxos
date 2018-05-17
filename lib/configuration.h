@@ -62,11 +62,13 @@ public:
     Configuration(int g, int n, int f,
                   std::map<int, std::vector<ReplicaAddress> > replicas,
                   ReplicaAddress *multicastAddress = nullptr,
-                  ReplicaAddress *fcAddress = nullptr);
+                  ReplicaAddress *sequencerAddress = nullptr,
+		  ReplicaAddress *fcAddress = nullptr);
     Configuration(std::ifstream &file);
     virtual ~Configuration();
     ReplicaAddress replica(int group, int idx) const;
     const ReplicaAddress *multicast() const;
+    const ReplicaAddress *sequencer() const;
     const ReplicaAddress *fc() const;
     inline int GetLeaderIndex(view_t view) const {
         return (view % n);
@@ -86,6 +88,8 @@ private:
     std::map<int, std::vector<ReplicaAddress> > replicas;
     ReplicaAddress *multicastAddress;
     bool hasMulticast;
+    ReplicaAddress *sequencerAddress;
+    bool hasSequencer;
     ReplicaAddress *fcAddress;
     bool hasFC;
 };

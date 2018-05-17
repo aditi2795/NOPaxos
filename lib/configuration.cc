@@ -55,11 +55,15 @@ ReplicaAddress::operator==(const ReplicaAddress &other) const {
 
 Configuration::Configuration(const Configuration &c)
     : g(c.g), n(c.n), f(c.f), replicas(c.replicas), hasMulticast(c.hasMulticast),
-      hasFC(c.hasFC)
+      hasSequencer(c.hasSequencer), hasFC(c.hasFC)
 {
     multicastAddress = NULL;
     if (hasMulticast) {
         multicastAddress = new ReplicaAddress(*c.multicastAddress);
+    }
+    sequencerAddress = NULL;
+    if (hasSequencer) {
+	sequencerAddress = new ReplicaAddress(*c.sequencerAddress);
     }
     fcAddress = NULL;
     if (hasFC) {
@@ -70,6 +74,7 @@ Configuration::Configuration(const Configuration &c)
 Configuration::Configuration(int g, int n, int f,
                              std::map<int, std::vector<ReplicaAddress> > replicas,
                              ReplicaAddress *multicastAddress,
+			     ReplicaAddress *sequencerAddress,
                              ReplicaAddress *fcAddress)
     : g(g), n(n), f(f), replicas(replicas)
 {
@@ -80,6 +85,15 @@ Configuration::Configuration(int g, int n, int f,
     } else {
         hasMulticast = false;
         multicastAddress = NULL;
+    }
+
+    if (sequencerAddress) {
+        hasSequencer = true;
+	this->sequencerAddress = 
+	    new ReplicaAddress(*sequencerAddress);
+    } else {
+	hasSequencer = false;
+	sequencerAddress = NULL;
     }
 
     if (fcAddress) {
@@ -97,6 +111,8 @@ Configuration::Configuration(std::ifstream &file)
     f = -1;
     hasMulticast = false;
     multicastAddress = NULL;
+    hasSequencer = false;
+    sequencerAddress = NULL;
     hasFC = false;
     fcAddress = NULL;
     int group = -1;
@@ -162,6 +178,22 @@ Configuration::Configuration(std::ifstream &file)
             multicastAddress = new ReplicaAddress(string(host),
                                                   string(port));
             hasMulticast = true;
+         } else if (strcasecmp(cmd, "sequencer") == 0) {
+            char *arg = strtok(NULL, " \t");
+            if (!arg) {
+                Panic ("'sequencer' configuration line requires an argument");
+            }
+
+            char *host = strtok(arg, ":");
+            char *port = strtok(NULL, "");
+
+            if (!host || !port) {
+                Panic("Configuration line format: 'sequencer host:port'");
+            }
+
+            sequencerAddress = new ReplicaAddress(string(host),
+                                                  string(port));
+            hasSequencer = true;
         } else if (strcasecmp(cmd, "fc") == 0) {
             char *arg = strtok(NULL, " \t");
             if (!arg) {
@@ -211,6 +243,9 @@ Configuration::~Configuration()
     if (hasMulticast) {
         delete multicastAddress;
     }
+    if (hasSequencer) {
+        delete sequencerAddress;
+    }
     if (hasFC) {
         delete fcAddress;
     }
@@ -227,6 +262,16 @@ Configuration::multicast() const
 {
     if (hasMulticast) {
         return multicastAddress;
+    } else {
+        return nullptr;
+    }
+}
+
+const ReplicaAddress *
+Configuration::sequencer() const
+{
+    if (hasSequencer) {
+        return sequencerAddress;
     } else {
         return nullptr;
     }
