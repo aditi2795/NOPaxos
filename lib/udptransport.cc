@@ -143,6 +143,20 @@ UDPTransport::LookupMulticastAddress(const specpaxos::Configuration
 }
 
 const UDPTransportAddress *
+UDPTransport::LookupSequencerAddress(const specpaxos::Configuration
+                                     *config)
+{
+    if (!config->sequencer()) {
+        // Configuration has no multicast address
+        return NULL;
+    }
+
+    UDPTransportAddress *addr =
+        new UDPTransportAddress(LookupAddress(*(config->sequencer())));
+    return addr;
+}
+
+const UDPTransportAddress *
 UDPTransport::LookupFCAddress(const specpaxos::Configuration
                               *config)
 {
@@ -542,9 +556,10 @@ UDPTransport::OrderedMulticast(TransportReceiver *src,
         LookupAddresses();
     }
 
-    auto kv = multicastAddresses.find(cfg);
-    if (kv == multicastAddresses.end()) {
-        Panic("Configuration has no multicast address...");
+    // Updated to send to sequencer instead of multicast address
+    auto kv = sequencerAddresses.find(cfg);
+    if (kv == sequencerAddresses.end()) {
+        Panic("Configuration has no sequencer address...");
     }
 
     // ordered multicast meta data wire format:

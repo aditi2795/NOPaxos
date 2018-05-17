@@ -140,6 +140,8 @@ private:
     const UDPTransportAddress *
     LookupMulticastAddress(const specpaxos::Configuration *cfg) override;
     const UDPTransportAddress *
+    LookupSequencerAddress(const specpaxos::Configuration *cfg) override;
+    const UDPTransportAddress *
         LookupFCAddress(const specpaxos::Configuration *cfg) override;
     void ListenOnMulticastPort(const specpaxos::Configuration
                                *canonicalConfig);

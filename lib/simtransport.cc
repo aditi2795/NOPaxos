@@ -234,6 +234,12 @@ SimulatedTransport::LookupMulticastAddress(const specpaxos::Configuration *cfg)
 }
 
 const SimulatedTransportAddress *
+SimulatedTransport::LookupSequencerAddress(const specpaxos::Configuration *cfg)
+{
+    return NULL;
+}
+
+const SimulatedTransportAddress *
 SimulatedTransport::LookupFCAddress(const specpaxos::Configuration *cfg)
 {
     if (fcAddress == -1) {

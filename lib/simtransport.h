@@ -98,6 +98,7 @@ protected:
                   int replicaIdx) override;
     const SimulatedTransportAddress *
     LookupMulticastAddress(const specpaxos::Configuration *cfg) override;
+    LookupSequencerAddress(const specpaxos::Configuration *cfg) override;
     const SimulatedTransportAddress *
     LookupFCAddress(const specpaxos::Configuration *cfg) override;
 

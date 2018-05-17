@@ -212,6 +212,8 @@ protected:
     virtual const ADDR *
     LookupMulticastAddress(const specpaxos::Configuration *cfg) = 0;
     virtual const ADDR *
+    LookupSequencerAddress(const specpaxos::Configuration *cfg) = 0;
+    virtual const ADDR *
     LookupFCAddress(const specpaxos::Configuration *cfg) = 0;
 
     std::unordered_map<specpaxos::Configuration,
@@ -223,6 +225,7 @@ protected:
     std::map<const specpaxos::Configuration *,
         std::map<int, std::map<int, TransportReceiver *> > > replicaReceivers;
     std::map<const specpaxos::Configuration *, ADDR> multicastAddresses;
+    std::map<const specpaxos::Configuration *, ADDR> sequencerAddresses;
     std::map<const specpaxos::Configuration *, ADDR> fcAddresses;
     std::map<TransportReceiver *, int> replicaGroups;
     bool replicaAddressesInitialized;
@@ -269,7 +272,8 @@ protected:
         // Clear any existing list of addresses
         replicaAddresses.clear();
         multicastAddresses.clear();
-        fcAddresses.clear();
+        sequencerAddresses.clear();
+	fcAddresses.clear();
 
         // For every configuration, look up all addresses and cache
         // them.
@@ -290,6 +294,14 @@ protected:
                     multicastAddresses.insert(std::make_pair(cfg, *addr));
                     delete addr;
                 }
+            }
+	    // Check for sequencer address
+	    if (cfg->sequencer()) {
+		const ADDR *addr = LookupSequencerAddress(cfg);
+		if (addr) {
+	            sequencerAddresses.insert(std::make_pair(cfg, *addr));
+		    delete addr;
+		}
             }
             // Failure coordinator address
             if (cfg->fc()) {
