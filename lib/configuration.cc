@@ -204,13 +204,24 @@ Configuration::Configuration(std::ifstream &file)
 
             char *host = strtok(arg, ":");
             char *port = strtok(NULL, "");
+            char *mac_str = strtok(NULL, "");
 
             if (!host || !port) {
                 Panic("Configuration line format: 'sequencer host:port'");
             }
+            unsigned int mac_long[ETH_ALEN];
+	    uint8_t mac[ETH_ALEN];
+	    if (sscanf(mac_str, "%02x:%02x:%02x:%02x:%02x:%02x",
+			    &mac_long[0], &mac_long[1], &mac_long[2], &mac_long[3], &mac_long[4], &mac_long[5]) != 6) {
+		    Panic("Invalid mac address for replica");
+	    }
+	    for (int i = 0; i < ETH_ALEN; i++) {
+                // Convert from unsigned int to uint8
+		mac[i] = mac_long[i];
+	    }
 
             sequencerAddress = new ReplicaAddress(string(host),
-                                                  string(port));
+                                                  string(port), mac);
             hasSequencer = true;
         } else if (strcasecmp(cmd, "fc") == 0) {
             char *arg = strtok(NULL, " \t");
