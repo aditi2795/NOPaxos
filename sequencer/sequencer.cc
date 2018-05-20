@@ -31,6 +31,7 @@
 #include <iostream>
 #include <fstream>
 #include "lib/message.h"
+#include "lib/configuration.h"
 #include "sequencer/sequencer.h"
 
 using namespace std;
@@ -105,8 +106,8 @@ Configuration::GetGroupAddr() {
     return this->groupAddr;
 }
 
-Transport::Transport(Sequencer *sequencer, Configuration *config)
-    : sequencer(sequencer), config(config), sockfd(-1)
+Transport::Transport(Sequencer *sequencer, Configuration *config, specpaxos::Configuration *global_config)
+    : sequencer(sequencer), config(config), global_config(global_config), sockfd(-1)
 {
     struct ifreq ifopts;
     struct sockaddr_ll sll;
@@ -269,13 +270,18 @@ Transport::ProcessPacket(uint8_t *packet, size_t len)
 
 int main(int argc, char *argv[]) {
     const char *config_path = nullptr;
+    const char *global_config_path = nullptr;
     int opt;
 
-    while ((opt = getopt(argc, argv, "c:")) != -1) {
+    while ((opt = getopt(argc, argv, "c:C")) != -1) {
         switch (opt) {
         case 'c':
             config_path = optarg;
             break;
+
+	case 'C':
+	    global_config_path = optarg;
+	    break;
 
         default:
             fprintf(stderr, "Unknown argument %s\n", argv[optind]);
@@ -288,6 +294,11 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    if (global_config_path == nullptr) {
+        fprintf(stderr, "option -C is required\n");
+	return 1;
+    }
+
     ifstream config_stream(config_path);
     if (config_stream.fail()) {
         fprintf(stderr, "unable to read configuration file: %s\n",
@@ -295,9 +306,18 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    ifstream global_config_stream(global_config_path);
+    if (global_config_stream.fail()) {
+        fprintf(stderr, "unable to read global configuration file: %s\n",
+                global_config_path);
+        return 1;
+    }
+
+
+    specpaxos::Configuration global_config(global_config_stream);
     sequencer::Configuration config(config_stream);
     sequencer::Sequencer sequencer(0);
-    sequencer::Transport transport(&sequencer, &config);
+    sequencer::Transport transport(&sequencer, &config, &global_config);
     transport.Run();
 
     return 0;

@@ -45,6 +45,8 @@
 
 #include <unordered_map>
 
+#include "lib/configuration.h"
+
 namespace sequencer {
 
 class Sequencer {
@@ -75,7 +77,7 @@ private:
 
 class Transport {
 public:
-    Transport(Sequencer *sequencer, Configuration *config);
+    Transport(Sequencer *sequencer, Configuration *config, specpaxos::Configuration *global_config);
     ~Transport();
     void Run();
 
@@ -85,6 +87,7 @@ private:
     static const int NONFRAG_MAGIC = 0x20050318;
     Sequencer *sequencer;
     Configuration *config;
+    specpaxos::Configuration *global_config;
     int sockfd;
     struct sockaddr_ll destSockAddrs[];
 
