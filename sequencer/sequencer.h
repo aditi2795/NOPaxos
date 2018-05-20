@@ -68,11 +68,9 @@ public:
     ~Configuration();
 
     std::string GetInterface();
-    std::string GetGroupAddr();
 
 private:
     std::string interface;
-    std::string groupAddr;
 };
 
 class Transport {

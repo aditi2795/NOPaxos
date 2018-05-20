@@ -76,18 +76,6 @@ Configuration::Configuration(ifstream &file) {
             }
 
             this->interface = string(iface);
-        } else if (strcasecmp(cmd, "groupaddr") == 0) {
-            char *arg = strtok(nullptr, " \t");
-            if (!arg) {
-                Panic("'groupaddr' configuration line requires an argument");
-            }
-
-            char *gaddr = strtok(arg, "");
-
-            if (!gaddr) {
-                Panic("Configuration line format: 'groupaddr addr;");
-            }
-            this->groupAddr = string(gaddr);
         } else {
             Panic("Unknown configuration directive: %s", cmd);
         }
@@ -99,11 +87,6 @@ Configuration::~Configuration() { }
 string
 Configuration::GetInterface() {
     return this->interface;
-}
-
-string
-Configuration::GetGroupAddr() {
-    return this->groupAddr;
 }
 
 Transport::Transport(Sequencer *sequencer, Configuration *config, specpaxos::Configuration *global_config)
