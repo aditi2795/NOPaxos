@@ -164,8 +164,8 @@ Configuration::Configuration(std::ifstream &file)
             char *host = strtok(arg, ":");
             char *port = strtok(NULL, ",");
 	    char *mac_str = strtok(NULL, "");
-	    uint8_t mac[ETH_ALEN];
-	    if (scanf(mac_str, "%02x:%02x:%02x:%02x:%02x:%02x",
+	    unsigned int mac[ETH_ALEN];
+	    if (sscanf(mac_str, "%02x:%02x:%02x:%02x:%02x:%02x",
 			    &mac[0], &mac[1], &mac[2], &mac[3], &mac[4], &mac[5]) != 6) {
 		    Panic("Invalid mac address for replica");
 	    }
@@ -174,7 +174,7 @@ Configuration::Configuration(std::ifstream &file)
                 Panic("Configuration line format: 'replica group host:port,mac'");
             }
 
-            replicas[group].push_back(ReplicaAddress(string(host), string(port), mac));
+            replicas[group].push_back(ReplicaAddress(string(host), string(port)/*, mac*/));
         } else if (strcasecmp(cmd, "multicast") == 0) {
             char *arg = strtok(NULL, " \t");
             if (!arg) {
