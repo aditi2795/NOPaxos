@@ -109,7 +109,6 @@ Configuration::GetGroupAddr() {
 Transport::Transport(Sequencer *sequencer, Configuration *config, specpaxos::Configuration *global_config)
     : sequencer(sequencer), config(config), global_config(global_config), sockfd(-1)
 {
-    struct ifreq ifopts;
     struct sockaddr_ll sll;
     int sockopt = 1;
 
@@ -171,13 +170,57 @@ Transport::Run() {
         }
 
         if (ProcessPacket(buffer, n)) {
-            if (sendto(this->sockfd, buffer, n, 0,
-                       (struct sockaddr*)&this->destSockAddrs[0], // TODO: fix!!!
-                       sizeof(struct sockaddr_ll)) < 0) {
-                Warning("Failed to send packet");
-            }
+            for (int i = 0; i < global_config->g; i++) {
+		for (int j = 0; j < global_config->n; j++) {
+		    specpaxos::ReplicaAddress replica = global_config->replica(i,j);
+    		    // Copy packet
+                    uint8_t copied_packet[n];
+		    memcpy(copied_packet, buffer, n);
+		    // Set destination IP and UDP port
+		    SetPacketDest(copied_packet, n, &replica);
+		    // Format destination socket address.
+		    struct sockaddr_ll sll;
+		    SetSocketDest(&sll, &replica);
+		    if (sendto(this->sockfd, buffer, n, 0,
+                           (struct sockaddr*)&sll, // TODO: fix!!!
+                           sizeof(struct sockaddr_ll)) < 0) {
+                        Warning("Failed to send packet");
+		    }
+		}
+	    }
         }
     }
+}
+
+void
+Transport::SetSocketDest(struct sockaddr_ll *sll, specpaxos::ReplicaAddress *replica) {
+    sll->sll_ifindex = ifopts.ifr_ifindex;
+    sll->sll_halen = ETH_ALEN;
+    // sll_addr has length 8, mac addrs only 6 long
+    sll->sll_addr[0] = replica->mac[0];
+    sll->sll_addr[1] = replica->mac[1];
+    sll->sll_addr[2] = replica->mac[2];
+    sll->sll_addr[3] = replica->mac[3];
+    sll->sll_addr[4] = replica->mac[4];
+    sll->sll_addr[5] = replica->mac[5];
+}
+
+void
+Transport::SetPacketDest(uint8_t *packet, size_t len, specpaxos::ReplicaAddress *replica) {
+    struct iphdr *iph;
+    struct udphdr *udph;
+    iph = (struct iphdr *)(packet + sizeof(struct ether_header));
+    udph = (struct udphdr *)(packet + sizeof(struct ether_header) + sizeof(struct iphdr));
+
+    // Set IP destination based on replica address.
+    uint32_t ip_dst;
+    if (!inet_pton(AF_INET, replica->host.c_str(), &ip_dst)) {
+	    Panic("Failed to parse replica IP address %s", replica->host.c_str());
+    }
+    iph->daddr = ip_dst;
+
+    // Set UDP destination port based on replica port.
+    udph->dest = stoi(replica->port); 
 }
 
 bool
@@ -220,9 +263,9 @@ Transport::ProcessPacket(uint8_t *packet, size_t len)
     ((struct sockaddr_in *)&saddr)->sin_addr.s_addr = iph->daddr;
     inet_ntop(AF_INET, &((struct sockaddr_in *)&saddr)->sin_addr, destip, sizeof(destip));
 
-    if (strcmp(destip, this->config->GetGroupAddr().c_str())) {
-        return false;
-    }
+    //if (strcmp(destip, this->config->GetGroupAddr().c_str())) {
+    //    return false;
+    //}
 
     /* Network ordered packet header format:
      * FRAG_MAGIC(32) | header data len (32) | original udp src (16) |

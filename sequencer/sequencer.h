@@ -89,8 +89,10 @@ private:
     Configuration *config;
     specpaxos::Configuration *global_config;
     int sockfd;
-    struct sockaddr_ll destSockAddrs[];
+    struct ifreq ifopts;
 
+    void SetPacketDest(uint8_t *packet, size_t len, specpaxos::ReplicaAddress *replica);
+    void SetSocketDest(struct sockaddr_ll *sll, specpaxos::ReplicaAddress *replica);
     bool ProcessPacket(uint8_t *packet, size_t len);
 };
 
