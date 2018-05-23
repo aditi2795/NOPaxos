@@ -239,10 +239,10 @@ Transport::cksum(unsigned short *ptr,int nbytes) {
 }
 
 uint16_t 
-Transport::udp_checksum(const void *buff, size_t len, uint16_t src_addr, uint16_t dest_addr)
+Transport::udp_checksum(const void *buff, size_t len, uint32_t src_addr, uint32_t dest_addr)
 {
         const uint16_t *buf = (const uint16_t *)buff;
-        uint16_t *ip_src=&src_addr, *ip_dst=&dest_addr;
+        uint32_t *ip_src=&src_addr, *ip_dst=&dest_addr;
         uint32_t sum;
         size_t length=len;
 

@@ -93,7 +93,7 @@ private:
     void SetSocketDest(struct sockaddr_ll *sll, specpaxos::ReplicaAddress *replica);
     bool ProcessPacket(uint8_t *packet, size_t len);
     unsigned short cksum(unsigned short *ptr, int nbytes);
-    uint16_t udp_checksum(const void *buf, size_t len, uint16_t src_addr, uint16_t dest_addr);
+    uint16_t udp_checksum(const void *buf, size_t len, uint32_t src_addr, uint32_t dest_addr);
 };
 
 } // namespace sequencer
