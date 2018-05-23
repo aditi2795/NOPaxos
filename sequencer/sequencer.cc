@@ -167,7 +167,7 @@ Transport::Run() {
 		    // Format destination socket address.
 		    struct sockaddr_ll sll;
 		    SetSocketDest(&sll, &replica);
-		    if (sendto(this->sockfd, buffer, n, 0,
+		    if (sendto(this->sockfd, copied_packet, n, 0,
                            (struct sockaddr*)&sll, // TODO: fix!!!
                            sizeof(struct sockaddr_ll)) < 0) {
                         Warning("Failed to send packet");
