@@ -212,9 +212,9 @@ Transport::SetPacketDest(uint8_t *packet, size_t len, specpaxos::ReplicaAddress 
 
     // Recompute checksum for IP (UDP checksum disabled).
     iph->check = 0;
-    iph->check = ntohs(cksum((unsigned short *)iph, sizeof(struct iphdr)));
+    iph->check = cksum((unsigned short *)iph, sizeof(struct iphdr));
     udph->check = 0;
-    udph->check = ntohs(udp_checksum(udph, ntohs(udph->len), iph->saddr, iph->daddr));
+    udph->check = udp_checksum(udph, ntohs(udph->len), iph->saddr, iph->daddr);
 }
 
 // From https://github.com/rbaron/raw_tcp_socket/blob/master/raw_tcp_socket.c.
