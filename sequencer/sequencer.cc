@@ -102,7 +102,7 @@ Transport::Transport(Sequencer *sequencer, Configuration *config, specpaxos::Con
     memset(&ifopts, 0, sizeof(ifopts));
     strncpy(ifopts.ifr_name, config->GetInterface().c_str(), IFNAMSIZ-1);
     if (ioctl(this->sockfd, SIOCGIFINDEX, &ifopts) < 0) {
-        Panic("Failed to set ioctl option SIOCGIFINDEX");
+        Panic("Failed to set ioctl option SIOCGIFINDEX: %s", strerror(errno));
     }
 
     if (setsockopt(this->sockfd, SOL_SOCKET, SO_REUSEADDR, &sockopt, sizeof(sockopt)) == -1) {
@@ -189,6 +189,7 @@ Transport::SetSocketDest(struct sockaddr_ll *sll, specpaxos::ReplicaAddress *rep
     sll->sll_addr[3] = replica->mac[3];
     sll->sll_addr[4] = replica->mac[4];
     sll->sll_addr[5] = replica->mac[5];
+    fprintf(stderr, "send to mac: %02x:%02x:%02x:%02x:%02x:%02x\n",replica->mac[0], replica->mac[1], replica->mac[2], replica->mac[3], replica->mac[4], replica->mac[5]);
 }
 
 void
@@ -203,10 +204,78 @@ Transport::SetPacketDest(uint8_t *packet, size_t len, specpaxos::ReplicaAddress 
     if (!inet_pton(AF_INET, replica->host.c_str(), &ip_dst)) {
 	    Panic("Failed to parse replica IP address %s", replica->host.c_str());
     }
+    fprintf(stderr, "IP dest: %s", replica->host.c_str());
     iph->daddr = ip_dst;
 
     // Set UDP destination port based on replica port.
-    udph->dest = stoi(replica->port); 
+    udph->dest = htons(stoi(replica->port)); 
+
+    // Recompute checksum for IP (UDP checksum disabled).
+    iph->check = 0;
+    iph->check = ntohs(cksum((unsigned short *)iph, sizeof(struct iphdr)));
+    udph->check = 0;
+    udph->check = ntohs(udp_checksum(udph, ntohs(udph->len), iph->saddr, iph->daddr));
+}
+
+// From https://github.com/rbaron/raw_tcp_socket/blob/master/raw_tcp_socket.c.
+unsigned short 
+Transport::cksum(unsigned short *ptr,int nbytes) {
+   long sum = 0;  /* assume 32 bit long, 16 bit short */
+
+   while(nbytes > 1){
+       sum += *(ptr)++;
+       if(sum & 0x80000000)   /* if high order bit set, fold */
+           sum = (sum & 0xFFFF) + (sum >> 16);
+       nbytes -= 2;
+   }
+
+   if(nbytes)       /* take care of left over byte */
+       sum += (unsigned short) *(unsigned char *)ptr;
+          
+   while(sum>>16)
+       sum = (sum & 0xFFFF) + (sum >> 16);
+
+   return ~sum;
+}
+
+uint16_t 
+Transport::udp_checksum(const void *buff, size_t len, uint16_t src_addr, uint16_t dest_addr)
+{
+        const uint16_t *buf = (const uint16_t *)buff;
+        uint16_t *ip_src=&src_addr, *ip_dst=&dest_addr;
+        uint32_t sum;
+        size_t length=len;
+
+        // Calculate the sum                                            //
+        sum = 0;
+        while (len > 1)
+        {
+                sum += *buf++;
+                if (sum & 0x80000000)
+                        sum = (sum & 0xFFFF) + (sum >> 16);
+                len -= 2;
+        }
+
+        if ( len & 1 )
+                // Add the padding if the packet lenght is odd          //
+                sum += *((uint8_t *)buf);
+
+        // Add the pseudo-header                                        //
+        sum += *(ip_src++);
+        sum += *ip_src;
+
+        sum += *(ip_dst++);
+        sum += *ip_dst;
+
+         sum += htons(IPPROTO_UDP);
+         sum += htons(length);
+
+         // Add the carries                                              //
+         while (sum >> 16)
+                 sum = (sum & 0xFFFF) + (sum >> 16);
+
+         // Return the one's complement of sum                           //
+         return ( (uint16_t)(~sum)  );
 }
 
 bool
