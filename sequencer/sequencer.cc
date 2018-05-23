@@ -117,6 +117,8 @@ Transport::Transport(Sequencer *sequencer, Configuration *config, specpaxos::Con
         Panic("Failed to bind socket");
     }
 
+    fprintf(stderr, "Transport setup complete.");
+
     /* Sequencer sends out packets using multicast */
     /*for (int i = 0; i < config->g; i++) {
 	for (int j = 0; j < config->n; j++) {
@@ -153,6 +155,7 @@ Transport::Run() {
         }
 
         if (ProcessPacket(buffer, n)) {
+            fprintf(stderr, "Process packet...\n");
             for (int i = 0; i < global_config->g; i++) {
 		for (int j = 0; j < global_config->n; j++) {
 		    specpaxos::ReplicaAddress replica = global_config->replica(i,j);
@@ -299,7 +302,7 @@ int main(int argc, char *argv[]) {
     const char *global_config_path = nullptr;
     int opt;
 
-    while ((opt = getopt(argc, argv, "c:C")) != -1) {
+    while ((opt = getopt(argc, argv, "c:C:")) != -1) {
         switch (opt) {
         case 'c':
             config_path = optarg;
