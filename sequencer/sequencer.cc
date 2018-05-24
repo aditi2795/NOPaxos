@@ -196,8 +196,25 @@ void
 Transport::SetPacketDest(uint8_t *packet, size_t len, specpaxos::ReplicaAddress *replica) {
     struct iphdr *iph;
     struct udphdr *udph;
+    struct ether_header *eh;
+    eh = (struct ether_header *)packet;
     iph = (struct iphdr *)(packet + sizeof(struct ether_header));
     udph = (struct udphdr *)(packet + sizeof(struct ether_header) + sizeof(struct iphdr));
+
+    // Set ethernet src and dest.
+    eh->ether_dhost[0] = replica->mac[0];
+    eh->ether_dhost[1] = replica->mac[1];
+    eh->ether_dhost[2] = replica->mac[2];
+    eh->ether_dhost[3] = replica->mac[3];
+    eh->ether_dhost[4] = replica->mac[4];
+    eh->ether_dhost[5] = replica->mac[5];
+    const specpaxos::ReplicaAddress *sequencer = global_config->sequencer();
+    eh->ether_shost[0] = sequencer->mac[0];
+    eh->ether_shost[1] = sequencer->mac[1];
+    eh->ether_shost[2] = sequencer->mac[2];
+    eh->ether_shost[3] = sequencer->mac[3];
+    eh->ether_shost[4] = sequencer->mac[4];
+    eh->ether_shost[5] = sequencer->mac[5];
 
     // Set IP destination based on replica address.
     uint32_t ip_dst;
