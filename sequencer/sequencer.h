@@ -89,7 +89,8 @@ private:
     int sockfd;
     struct ifreq ifopts;
 
-    void SetPacketDest(uint8_t *packet, size_t len, specpaxos::ReplicaAddress *replica);
+    void SetPacketDest(uint8_t *packet, specpaxos::ReplicaAddress *replica);
+    void SetOuterPacketDestSrc(uint8_t *packet, specpaxos::ReplicaAddress *replica);
     void SetSocketDest(struct sockaddr_ll *sll, specpaxos::ReplicaAddress *replica);
     bool ProcessPacket(uint8_t *packet, size_t len);
     unsigned short cksum(unsigned short *ptr, int nbytes);
