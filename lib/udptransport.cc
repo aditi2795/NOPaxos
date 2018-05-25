@@ -624,7 +624,7 @@ DecodePacket(const char *buf, size_t sz,
     ptr += sizeof(size_t);
     ASSERT(ptr - buf < ssz);
 
-    ASSERT(ptr + typeLen - buf < ssz);
+    //ASSERT(ptr + typeLen - buf < ssz);
     type = string(ptr, typeLen);
     Notice("Type is %s", type.c_str());
     ptr += typeLen;
