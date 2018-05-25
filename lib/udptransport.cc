@@ -731,6 +731,7 @@ UDPTransport::ProcessPacket(int fd, sockaddr_in sender, socklen_t senderSize,
     } else {
 	// Check if encapsulated packet.
 	buf += sizeof(ether_header) + sizeof(iphdr) + sizeof(udphdr);
+	sz -= sizeof(ether_header) + sizeof(iphdr) + sizeof(udphdr);
 	magic = *(uint32_t *)buf;
         if (magic == NONFRAG_MAGIC) {
             // Not a fragment. Decode the packet
