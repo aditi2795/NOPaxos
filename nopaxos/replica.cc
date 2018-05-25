@@ -239,7 +239,7 @@ NOPaxosReplica::ReceiveMessage(const TransportAddress &remote,
         HandleSyncCommit(remote, syncCommit);
     }
     else {
-        Panic("Received unexpected message type in NOPaxos proto: %s",
+         Panic("Received unexpected message type in NOPaxos proto: %s",
               type.c_str());
     }
 

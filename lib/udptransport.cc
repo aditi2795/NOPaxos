@@ -48,6 +48,8 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <signal.h>
+#include <linux/ip.h>
+#include <linux/udp.h>
 
 const size_t MAX_UDP_MESSAGE_SIZE = 9000; // XXX
 const int SOCKET_BUF_SIZE = 10485760;
@@ -727,7 +729,16 @@ UDPTransport::ProcessPacket(int fd, sockaddr_in sender, socklen_t senderSize,
             return;
         }
     } else {
-        Warning("Received packet with bad magic number");
+	// Check if encapsulated packet.
+	buf += sizeof(ether_header) + sizeof(iphdr) + sizeof(udphdr);
+	magic = *(uint32_t *)buf;
+        if (magic == NONFRAG_MAGIC) {
+            // Not a fragment. Decode the packet
+            DecodePacket(buf + sizeof(uint32_t), sz - sizeof(uint32_t),
+                     msgType, msg, &meta_data);
+	} else { 
+	    Warning("Received packet with bad magic number");
+	}
     }
 
     // Currently, only ordered multicast puts meta data
