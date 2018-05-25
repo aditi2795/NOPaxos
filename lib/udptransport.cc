@@ -626,7 +626,7 @@ DecodePacket(const char *buf, size_t sz,
 
     ASSERT(ptr + typeLen - buf < ssz);
     type = string(ptr, typeLen);
-    Debug("Type is %s", type.c_str());
+    Notice("Type is %s", type.c_str());
     ptr += typeLen;
 
     size_t msgLen = *((size_t *)ptr);
@@ -736,7 +736,7 @@ UDPTransport::ProcessPacket(int fd, sockaddr_in sender, socklen_t senderSize,
 	magic = *(uint32_t *)buf;
         if (magic == NONFRAG_MAGIC) {
             // Not a fragment. Decode the packet
-	    Debug("Found encapsulated packet");
+	    Notice("Found encapsulated packet");
             DecodePacket(buf + sizeof(uint32_t), sz - sizeof(uint32_t),
                      msgType, msg, &meta_data);
 	} else { 
