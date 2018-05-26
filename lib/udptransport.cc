@@ -735,6 +735,13 @@ UDPTransport::ProcessPacket(int fd, sockaddr_in sender, socklen_t senderSize,
         }
     } else {
 	// Check if encapsulated packet.
+	struct iphdr *iph = (struct iphdr *)(buf + sizeof(struct ether_header));
+	struct udphdr *udph = (struct udphdr *)(buf + sizeof(struct ether_header) + sizeof(struct iphdr));
+	sender.sin_addr.s_addr = iph->saddr;
+        sender.sin_port = udph->source;
+	char str[30];
+        inet_ntop(AF_INET, &(sender.sin_addr), str, 30);
+	Notice("new sender addr is %s\n", str);
 	buf += sizeof(ether_header) + sizeof(iphdr) + sizeof(udphdr);
 	Notice("original len was %d", (int) sz);
 	sz -= sizeof(ether_header) + sizeof(iphdr) + sizeof(udphdr);
@@ -744,13 +751,6 @@ UDPTransport::ProcessPacket(int fd, sockaddr_in sender, socklen_t senderSize,
 	    Notice("Found encapsulated packet");
             DecodePacket(buf + sizeof(uint32_t), sz - sizeof(uint32_t),
                      msgType, msg, &meta_data);
-	    struct iphdr *iph = (struct iphdr *)(buf + sizeof(struct ether_header));
-	    struct udphdr *udph = (struct udphdr *)(buf + sizeof(struct iphdr));
-	    sender.sin_addr.s_addr = iph->saddr;
-            sender.sin_port = udph->source;
-	    char str[30];
-            inet_ntop(AF_INET, &(sender.sin_addr), str, 30);
-	    Notice("new sender addr is %s\n", str);
 	} else { 
 	    Warning("Received packet with bad magic number");
 	}
