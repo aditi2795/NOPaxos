@@ -628,7 +628,7 @@ DecodePacket(const char *buf, size_t sz,
     ASSERT(ptr - buf < ssz);
 
     Notice("size of packet is %d", (int) ssz);
-    ASSERT(ptr + typeLen - buf < ssz);
+    //ASSERT(ptr + typeLen - buf < ssz);
     type = string(ptr, typeLen);
     Notice("Type is %s, typelen is %d", type.c_str(), (int) typeLen);
     ptr += typeLen;
@@ -736,6 +736,7 @@ UDPTransport::ProcessPacket(int fd, sockaddr_in sender, socklen_t senderSize,
     } else {
 	// Check if encapsulated packet.
 	buf += sizeof(ether_header) + sizeof(iphdr) + sizeof(udphdr);
+	Notice("original len was %d", (int) sz);
 	sz -= sizeof(ether_header) + sizeof(iphdr) + sizeof(udphdr);
 	magic = *(uint32_t *)buf;
         if (magic == NONFRAG_MAGIC) {
