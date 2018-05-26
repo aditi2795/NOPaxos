@@ -435,7 +435,6 @@ SerializeMessage(const string &data, const string &type,
                         typeLen + sizeof(typeLen) +
                         dataLen + sizeof(dataLen));
 
-    Notice("metalen is %d, type is %s, typelen is %d, data len is %d, total len isi %d", (int) meta_len, type.c_str(), (int) typeLen, (int) dataLen, (int) totalLen);
     char *buf = new char[totalLen];
 
     char *ptr = buf;
@@ -613,9 +612,7 @@ DecodePacket(const char *buf, size_t sz,
     ssize_t ssz = sz;
     const char *ptr = buf;
 
-    Notice("sz is %d", (int) sz);
     size_t meta_len = *(uint32_t *)ptr;
-    Notice("meta_len is %d", (int) meta_len);
     ptr += sizeof(uint32_t);
 
     if (meta_len > 0) {
@@ -627,10 +624,8 @@ DecodePacket(const char *buf, size_t sz,
     ptr += sizeof(size_t);
     ASSERT(ptr - buf < ssz);
 
-    Notice("size of packet is %d", (int) ssz);
-    //ASSERT(ptr + typeLen - buf < ssz);
+    ASSERT(ptr + typeLen - buf < ssz);
     type = string(ptr, typeLen);
-    Notice("Type is %s, typelen is %d", type.c_str(), (int) typeLen);
     ptr += typeLen;
 
     size_t msgLen = *((size_t *)ptr);
@@ -663,7 +658,6 @@ UDPTransport::OnReadable(int fd)
                 PWarning("Failed to receive message from socket");
             }
         }
-	Notice("raw sz = %d", (int) sz);
         ProcessPacket(fd, sender, senderSize, buf, sz);
     } while (0);
 }
@@ -737,18 +731,14 @@ UDPTransport::ProcessPacket(int fd, sockaddr_in sender, socklen_t senderSize,
 	// Check if encapsulated packet.
 	struct iphdr *iph = (struct iphdr *)(buf + sizeof(struct ether_header));
 	struct udphdr *udph = (struct udphdr *)(buf + sizeof(struct ether_header) + sizeof(struct iphdr));
+	// Change sender to encapsulated packet sender.
 	sender.sin_addr.s_addr = iph->saddr;
         sender.sin_port = udph->source;
-	char str[30];
-        inet_ntop(AF_INET, &(sender.sin_addr), str, 30);
-	Notice("new sender addr is %s\n", str);
 	buf += sizeof(ether_header) + sizeof(iphdr) + sizeof(udphdr);
-	Notice("original len was %d", (int) sz);
 	sz -= sizeof(ether_header) + sizeof(iphdr) + sizeof(udphdr);
 	magic = *(uint32_t *)buf;
         if (magic == NONFRAG_MAGIC) {
             // Not a fragment. Decode the packet
-	    Notice("Found encapsulated packet");
             DecodePacket(buf + sizeof(uint32_t), sz - sizeof(uint32_t),
                      msgType, msg, &meta_data);
 	} else { 

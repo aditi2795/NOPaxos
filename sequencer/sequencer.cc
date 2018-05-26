@@ -155,7 +155,6 @@ Transport::Run() {
         }
 
         if (ProcessPacket(buffer, n)) {
-            fprintf(stderr, "Process packet...\n");
             for (int i = 0; i < global_config->g; i++) {
 		for (int j = 0; j < global_config->n; j++) {
 		    specpaxos::ReplicaAddress replica = global_config->replica(i,j);
@@ -213,26 +212,14 @@ Transport::SetPacketDest(uint8_t *packet, specpaxos::ReplicaAddress *replica) {
     eh->ether_dhost[3] = replica->mac[3];
     eh->ether_dhost[4] = replica->mac[4];
     eh->ether_dhost[5] = replica->mac[5];
-/*    const specpaxos::ReplicaAddress *sequencer = global_config->sequencer();
-    eh->ether_shost[0] = sequencer->mac[0];
-    eh->ether_shost[1] = sequencer->mac[1];
-    eh->ether_shost[2] = sequencer->mac[2];
-    eh->ether_shost[3] = sequencer->mac[3];
-    eh->ether_shost[4] = sequencer->mac[4];
-    eh->ether_shost[5] = sequencer->mac[5];
-*/
+    
     // Set IP destination based on replica address.
     uint32_t ip_dst;
     if (!inet_pton(AF_INET, replica->host.c_str(), &ip_dst)) {
 	    Panic("Failed to parse replica IP address %s", replica->host.c_str());
     }
-/*    uint32_t ip_src;
-    if (!inet_pton(AF_INET, sequencer->host.c_str(), &ip_src)) {
-	    Panic("Failed to parse sequencer IP address %s", sequencer->host.c_str());
-    }*/
     fprintf(stderr, "IP dest: %s", replica->host.c_str());
     iph->daddr = ip_dst;
-//    iph->saddr = ip_src;
 
     // Set UDP destination port based on replica port.
     udph->dest = htons(stoi(replica->port)); 
@@ -277,7 +264,6 @@ Transport::SetOuterPacketDestSrc(uint8_t *packet, specpaxos::ReplicaAddress *rep
     if (!inet_pton(AF_INET, sequencer->host.c_str(), &ip_src)) {
 	    Panic("Failed to parse sequencer IP address %s", sequencer->host.c_str());
     }
-    fprintf(stderr, "IP dest: %s", replica->host.c_str());
     iph->daddr = ip_dst;
     iph->saddr = ip_src;
     iph->tot_len = htons(ntohs(iph->tot_len) + sizeof(struct ether_header) + sizeof(struct iphdr) + sizeof(struct udphdr));
