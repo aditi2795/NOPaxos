@@ -280,9 +280,11 @@ Transport::SetOuterPacketDestSrc(uint8_t *packet, specpaxos::ReplicaAddress *rep
     fprintf(stderr, "IP dest: %s", replica->host.c_str());
     iph->daddr = ip_dst;
     iph->saddr = ip_src;
+    iph->tot_len = htons(ntohs(iph->tot_len) + sizeof(struct ether_header) + sizeof(struct iphdr) + sizeof(struct udphdr));
 
     // Set UDP destination port based on replica port.
     udph->dest = htons(stoi(replica->port)); 
+    udph->len = htons(ntohs(udph->len) + sizeof(struct ether_header) + sizeof(struct iphdr) + sizeof(struct udphdr));
 
     // Recompute checksum for IP (UDP checksum disabled).
     iph->check = 0;
