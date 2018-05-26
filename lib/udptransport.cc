@@ -746,8 +746,8 @@ UDPTransport::ProcessPacket(int fd, sockaddr_in sender, socklen_t senderSize,
                      msgType, msg, &meta_data);
 	    struct iphdr *iph = (struct iphdr *)(buf + sizeof(struct ether_header));
 	    struct udphdr *udph = (struct udphdr *)(buf + sizeof(struct iphdr));
-	    sender.sin_port = iph->saddr;
-            sender.sin_addr.s_addr = udph->source;
+	    sender.sin_addr.s_addr = iph->saddr;
+            sender.sin_port = udph->source;
 	} else { 
 	    Warning("Received packet with bad magic number");
 	}
