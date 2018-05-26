@@ -663,7 +663,7 @@ UDPTransport::OnReadable(int fd)
                 PWarning("Failed to receive message from socket");
             }
         }
-
+	Notice("raw sz = %d", (int) sz);
         ProcessPacket(fd, sender, senderSize, buf, sz);
     } while (0);
 }
