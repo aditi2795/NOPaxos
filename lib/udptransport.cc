@@ -435,7 +435,7 @@ SerializeMessage(const string &data, const string &type,
                         typeLen + sizeof(typeLen) +
                         dataLen + sizeof(dataLen));
 
-    Notice("metalen is %d, type is %s, typelen is %d", (int) meta_len, type.c_str(), (int) typeLen);
+    Notice("metalen is %d, type is %s, typelen is %d, data len is %d, total len isi %d", (int) meta_len, type.c_str(), (int) typeLen, (int) dataLen, (int) totalLen);
     char *buf = new char[totalLen];
 
     char *ptr = buf;
@@ -613,6 +613,7 @@ DecodePacket(const char *buf, size_t sz,
     ssize_t ssz = sz;
     const char *ptr = buf;
 
+    Notice("sz is %d", (int) sz);
     size_t meta_len = *(uint32_t *)ptr;
     Notice("meta_len is %d", (int) meta_len);
     ptr += sizeof(uint32_t);
@@ -626,7 +627,8 @@ DecodePacket(const char *buf, size_t sz,
     ptr += sizeof(size_t);
     ASSERT(ptr - buf < ssz);
 
-    //ASSERT(ptr + typeLen - buf < ssz);
+    Notice("size of packet is %d", (int) ssz);
+    ASSERT(ptr + typeLen - buf < ssz);
     type = string(ptr, typeLen);
     Notice("Type is %s, typelen is %d", type.c_str(), (int) typeLen);
     ptr += typeLen;
