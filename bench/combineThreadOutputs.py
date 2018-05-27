@@ -1,5 +1,5 @@
 # usage:
-# ./bench/client -c config -m unreplicated > output.txt
+# ./bench/client -c config -m unreplicated &> output.txt
 # python ./bench/combineThreadOutputs.py
 import re
 
@@ -24,8 +24,9 @@ else:
     print "No throughput measurements"
 
 # Average latency is 125968 ns (125 us)
-p2 = re.compile("Average latency is [0-9]* ns \(([0-9]+) us\)");
+p2 = re.compile("Average latency is [0-9]* .s .([0-9]+) .s");
 match_iter2 = p2.finditer(file_text);
+print match_iter2;
 sum_avg_latency = 0;
 num_avg_latency = 0;
 for m in match_iter2:
