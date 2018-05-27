@@ -31,11 +31,8 @@ for i, machine in enumerate(machines):
     output = processes[i].stdout.read() 
     outputLines = output.splitlines()
     elems = outputLines[0].split(":")
-    print elems
-    print ("Adding value to throughput: " + str(float(elems[1])))
     tot_throughput += float(elems[1])
     elems = outputLines[1].split(":")
-    print ("Adding value to latency: " + str(float(elems[1])))
     tot_latency += float(elems[1])
 
 # Collect output
