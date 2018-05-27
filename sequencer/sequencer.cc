@@ -193,7 +193,6 @@ Transport::SetSocketDest(struct sockaddr_ll *sll, specpaxos::ReplicaAddress *rep
     sll->sll_addr[3] = replica->mac[3];
     sll->sll_addr[4] = replica->mac[4];
     sll->sll_addr[5] = replica->mac[5];
-    fprintf(stderr, "send to mac: %02x:%02x:%02x:%02x:%02x:%02x\n",replica->mac[0], replica->mac[1], replica->mac[2], replica->mac[3], replica->mac[4], replica->mac[5]);
 }
 
 void
@@ -218,7 +217,6 @@ Transport::SetPacketDest(uint8_t *packet, specpaxos::ReplicaAddress *replica) {
     if (!inet_pton(AF_INET, replica->host.c_str(), &ip_dst)) {
 	    Panic("Failed to parse replica IP address %s", replica->host.c_str());
     }
-    fprintf(stderr, "IP dest: %s", replica->host.c_str());
     iph->daddr = ip_dst;
 
     // Set UDP destination port based on replica port.
