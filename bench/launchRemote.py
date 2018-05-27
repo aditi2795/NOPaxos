@@ -14,7 +14,7 @@ protocol = sys.argv[2]
 machines = sys.argv[3:]
 
 project = "nopaxos-204404"
-zone = "us-west1-a"
+zone = "us-central1-a"
 config = "config"
 remote_cmd = ("cd NOPaxos; ./bench/client -t %d -c %s -m %s > output.txt; python ./bench/combineThreadOutputs.py") % (threads, config, protocol)
 tot_throughput = 0.0
