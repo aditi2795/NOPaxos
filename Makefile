@@ -7,7 +7,7 @@ CXX = g++
 LD = g++
 EXPAND = lib/tmpl/expand
 
-CFLAGS := -g -Wall -pthread -iquote.obj/gen -Wno-uninitialized -O3
+CFLAGS := -g -Wall -pthread -iquote.obj/gen -Wno-uninitialized -O3 -DNASSERT
 CXXFLAGS := -std=c++0x -O3
 LDFLAGS := -levent_pthreads -ldl
 LIBPATH := -I./
