@@ -16,7 +16,7 @@ numClientMachines = string.atoi(sys.argv[4])
 
 project = "nopaxos-204404"
 zone = "us-west1-a"
-configMap = {5: "config-5"} # TODO: add others
+configMap = {3: "config", 5: "config-5", 7: "config-7", 9: "config-9"} # TODO: add others
 replicas = ["nopaxos-1", "nopaxos-2", "nopaxos-3", "nopaxos-04", "nopaxos-05", "nopaxos-06", "nopaxos-07", "nopaxos-08", "nopaxos-09"]
 clients = ["client", "client-2", "client-3"]
 config = configMap[numReplicas]
