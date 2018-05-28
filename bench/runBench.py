@@ -1,7 +1,9 @@
 # Arguments in order: protocol, #replicas, #threads per client, #client machines
 # EX: python ./bench/runBench.py unreplicated 5 1 1
+# To run with batching, use protocol "batch"
 import sys, string
 import subprocess
+import os
 
 def generateCmdStr(machine, remoteCmd):
     return ("gcloud compute --project \"%s\" ssh --zone \"%s\" \"%s\" --command \"%s\"") % (project, zone, machine, remoteCmd)
@@ -22,26 +24,36 @@ clients = ["client", "client-2", "client-3"]
 config = configMap[numReplicas]
 sequencer = "seqeuencer"
 processes = []
+devNull = open(os.devnull, 'w')
 
 # Start sequencer for nopaxos
 if protocol == "nopaxos":
     sequencerCmd = ("sudo lsof -t -i udp:8000 | sudo xargs kill; cd /home/emmadauterman/NOPaxos; sudo ./sequencer/sequencer -C %s -c sequencer_config") % config
-    process = subprocess.Popen(generateCmdStr(sequencer, sequencerCmd), shell=True) 
+    process = subprocess.Popen(generateCmdStr(sequencer, sequencerCmd),
+            stdout=devNull, stderr=devNull, shell=True) 
     proccesses.append(process)
 
 # Start replicas
 for i in range(0, numReplicas):
-    replicaCmd = ("sudo lsof -t -i udp:8000 | sudo xargs kill; cd /home/emmadauterman/NOPaxos; ./bench/replica -c %s -i %d -m %s") % (config, i, protocol)
-    process = subprocess.Popen(generateCmdStr(replicas[i], replicaCmd), shell=True)
+    protocolStr = protocol
+    if protocol == "batch":
+        protocolStr = "vr -b 10"
+    replicaCmd = ("sudo lsof -t -i udp:8000 | sudo xargs kill; cd /home/emmadauterman/NOPaxos; ./bench/replica -c %s -i %d -m %s") % (config, i, protocolStr)
+    process = subprocess.Popen(generateCmdStr(replicas[i], replicaCmd),
+            stdout=devNull, stderr=devNull, shell=True)
     processes.append(process)
 
 # Start clients
-clientCmd = ("cd /home/emmadauterman/NOPaxos; rm output.txt; ./bench/client -t %d -c %s -m %s &> output.txt; python ./bench/combineThreadOutputs.py") % (numThreadsPerClient, config, protocol)
+protocolStr = protocol
+if protocol == "batch":
+    protocolStr = "vr"
+clientCmd = ("cd /home/emmadauterman/NOPaxos; rm output.txt; ./bench/client -t %d -c %s -m %s &> output.txt; python ./bench/combineThreadOutputs.py") % (numThreadsPerClient, config, protocolStr)
 clientProcesses = []
 totThroughput = 0.0
 totLatency = 0.0
 for i in range(0, numClientMachines):
-    process = subprocess.Popen(generateCmdStr(clients[i], clientCmd), shell=True, stdout=subprocess.PIPE)
+    process = subprocess.Popen(generateCmdStr(clients[i], clientCmd),
+            shell=True, stderr=devNull, stdout=subprocess.PIPE)
     clientProcesses.append(process)
 
 for i in range(0, numClientMachines):
