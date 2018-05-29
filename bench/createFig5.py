@@ -9,9 +9,9 @@ import matplotlib.pyplot as plt
 
 clientMachines = 3
 averageRuns = 1
-#protocols = ["unreplicated", "vr", "batch", "fastpaxos", "nopaxos"]
+protocols = ["unreplicated", "vr", "batch", "fastpaxos", "nopaxos"]
 #protocols = ["unreplicated", "vr", "batch"]
-protocols = ["nopaxos"]
+#protocols = ["nopaxos"]
 maxThreads = {"unreplicated": 12, "vr": 5, "batch": 10, "fastpaxos": 5,
         "nopaxos": 12}
 for protocol in protocols:
