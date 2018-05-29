@@ -12,8 +12,8 @@ averageRuns = 1
 protocols = ["unreplicated", "vr", "batch", "fastpaxos", "nopaxos"]
 #protocols = ["unreplicated", "vr", "batch"]
 #protocols = ["nopaxos"]
-maxThreads = {"unreplicated": 12, "vr": 5, "batch": 10, "fastpaxos": 5,
-        "nopaxos": 12}
+maxThreads = {"unreplicated": 12, "vr": 5, "batch": 25, "fastpaxos": 5,
+        "nopaxos": 20}
 for protocol in protocols:
     throughputList = []
     latencyList = []

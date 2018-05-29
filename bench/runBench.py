@@ -31,7 +31,7 @@ def runTest(protocol, numReplicas, numThreadsPerClient, numClientMachines):
 
     # Start sequencer for nopaxos
     if protocol == "nopaxos":
-        sequencerCmd = ("sudo lsof -t -i udp:8000 | sudo xargs kill; cd /home/emmadauterman/NOPaxos; sudo ./sequencer/sequencer -C %s -c sequencer_config") % config
+        sequencerCmd = ("sudo kill \$(ps aux | grep 'sequencer' | grep -v grep | awk '{print \$2}'); cd /home/emmadauterman/NOPaxos; sudo ./sequencer/sequencer -C %s -c sequencer_config") % config
         process = subprocess.Popen(generateCmdStr(sequencer, sequencerCmd),
             shell=True) 
         processes.append(process)
@@ -52,7 +52,7 @@ def runTest(protocol, numReplicas, numThreadsPerClient, numClientMachines):
     protocolStr = protocol
     if protocol == "batch":
         protocolStr = "vr"
-    clientCmd = ("cd /home/emmadauterman/NOPaxos; rm output.txt; ./bench/client -t %d -c %s -m %s &> output.txt; python ./bench/combineThreadOutputs.py") % (numThreadsPerClient, config, protocolStr)
+    clientCmd = ("cd /home/emmadauterman/NOPaxos; rm output.txt; ./bench/client -t %d -c %s -m %s -n 1000 &> output.txt; python ./bench/combineThreadOutputs.py") % (numThreadsPerClient, config, protocolStr)
     clientProcesses = []
     timers = []
     totThroughput = 0.0
