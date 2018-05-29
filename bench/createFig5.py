@@ -22,6 +22,7 @@ for protocol in protocols:
         avgLatency = 0
         for i in range(averageRuns):
             throughput, latency = runTest(protocol, 3, threads, clientMachines)
+            #change to 5 for real testing!
             if throughput == -1 and latency == -1:
                 continue
             avgThroughput += throughput
