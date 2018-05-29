@@ -158,16 +158,11 @@ Transport::Run() {
             for (int i = 0; i < global_config->g; i++) {
 		for (int j = 0; j < global_config->n; j++) {
 		    specpaxos::ReplicaAddress replica = global_config->replica(i,j);
-    		    // Encapsulate packet.
-                    uint8_t copied_packet[n + sizeof(ether_header) + sizeof(iphdr) + sizeof(udphdr)];
-		    // Copy entire client packet into UDP payload.
-		    memcpy(copied_packet + sizeof(ether_header) + sizeof(iphdr) + sizeof(udphdr), buffer, n);
-		    // Copy current client headers (for modification).
-		    memcpy(copied_packet, buffer, sizeof(ether_header) + sizeof(iphdr) + sizeof(udphdr));
+                    uint8_t copied_packet[n];
+		    // Copy entire packet.
+		    memcpy(copied_packet, buffer, n);
 		    // Set destination IP and UDP port in client packet.
-		    SetPacketDest(copied_packet + sizeof(ether_header) + sizeof(iphdr) + sizeof(udphdr), &replica);
-		    // Set source and destination IP and UDP port in client packet.
-		    SetOuterPacketDestSrc(copied_packet, &replica);
+		    SetPacketDest(copied_packet, &replica);
 		    // Format destination socket address.
 		    struct sockaddr_ll sll;
 		    SetSocketDest(&sll, &replica);
@@ -193,7 +188,6 @@ Transport::SetSocketDest(struct sockaddr_ll *sll, specpaxos::ReplicaAddress *rep
     sll->sll_addr[3] = replica->mac[3];
     sll->sll_addr[4] = replica->mac[4];
     sll->sll_addr[5] = replica->mac[5];
-    fprintf(stderr, "send to mac: %02x:%02x:%02x:%02x:%02x:%02x\n",replica->mac[0], replica->mac[1], replica->mac[2], replica->mac[3], replica->mac[4], replica->mac[5]);
 }
 
 void
@@ -218,59 +212,10 @@ Transport::SetPacketDest(uint8_t *packet, specpaxos::ReplicaAddress *replica) {
     if (!inet_pton(AF_INET, replica->host.c_str(), &ip_dst)) {
 	    Panic("Failed to parse replica IP address %s", replica->host.c_str());
     }
-    fprintf(stderr, "IP dest: %s", replica->host.c_str());
     iph->daddr = ip_dst;
 
     // Set UDP destination port based on replica port.
     udph->dest = htons(stoi(replica->port)); 
-
-    // Recompute checksum for IP (UDP checksum disabled).
-    iph->check = 0;
-    iph->check = cksum((unsigned short *)iph, sizeof(struct iphdr));
-    udph->check = 0;
-    udph->check = udp_checksum(udph, ntohs(udph->len), iph->saddr, iph->daddr);
-}
-
-void
-Transport::SetOuterPacketDestSrc(uint8_t *packet, specpaxos::ReplicaAddress *replica) {
-    struct iphdr *iph;
-    struct udphdr *udph;
-    struct ether_header *eh;
-    eh = (struct ether_header *)packet;
-    iph = (struct iphdr *)(packet + sizeof(struct ether_header));
-    udph = (struct udphdr *)(packet + sizeof(struct ether_header) + sizeof(struct iphdr));
-
-    // Set ethernet src and dest.
-    eh->ether_dhost[0] = replica->mac[0];
-    eh->ether_dhost[1] = replica->mac[1];
-    eh->ether_dhost[2] = replica->mac[2];
-    eh->ether_dhost[3] = replica->mac[3];
-    eh->ether_dhost[4] = replica->mac[4];
-    eh->ether_dhost[5] = replica->mac[5];
-    const specpaxos::ReplicaAddress *sequencer = global_config->sequencer();
-    eh->ether_shost[0] = sequencer->mac[0];
-    eh->ether_shost[1] = sequencer->mac[1];
-    eh->ether_shost[2] = sequencer->mac[2];
-    eh->ether_shost[3] = sequencer->mac[3];
-    eh->ether_shost[4] = sequencer->mac[4];
-    eh->ether_shost[5] = sequencer->mac[5];
-
-    // Set IP destination based on replica address.
-    uint32_t ip_dst;
-    if (!inet_pton(AF_INET, replica->host.c_str(), &ip_dst)) {
-	    Panic("Failed to parse replica IP address %s", replica->host.c_str());
-    }
-    uint32_t ip_src;
-    if (!inet_pton(AF_INET, sequencer->host.c_str(), &ip_src)) {
-	    Panic("Failed to parse sequencer IP address %s", sequencer->host.c_str());
-    }
-    iph->daddr = ip_dst;
-    iph->saddr = ip_src;
-    iph->tot_len = htons(ntohs(iph->tot_len) + sizeof(struct ether_header) + sizeof(struct iphdr) + sizeof(struct udphdr));
-
-    // Set UDP destination port based on replica port.
-    udph->dest = htons(stoi(replica->port)); 
-    udph->len = htons(ntohs(udph->len) + sizeof(struct ether_header) + sizeof(struct iphdr) + sizeof(struct udphdr));
 
     // Recompute checksum for IP (UDP checksum disabled).
     iph->check = 0;
