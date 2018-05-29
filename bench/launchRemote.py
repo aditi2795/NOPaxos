@@ -16,7 +16,7 @@ machines = sys.argv[3:]
 project = "nopaxos-204404"
 zone = "us-west1-a"
 config = "config-5"
-remote_cmd = ("cd NOPaxos; rm output.txt; ./bench/client -t %d -c %s -m %s &> output.txt; python ./bench/combineThreadOutputs.py") % (threads, config, protocol)
+remote_cmd = ("cd ../emmadauterman/NOPaxos; rm output.txt; ./bench/client -t %d -c %s -n 1000 -m %s &> output.txt; python ./bench/combineThreadOutputs.py") % (threads, config, protocol)
 tot_throughput = 0.0
 tot_latency = 0.0
 
