@@ -20,8 +20,9 @@ def timeout(p):
         p.terminate()
 
 def runTest(protocol, numReplicas, numThreadsPerClient, numClientMachines):
-    configMap = {3: "new_config", 5: "config-5", 7: "config-7", 9: "config-9"} # TODO: add others
-    replicas = ["replica-1", "replica-2", "replica-3", "nopaxos-04", "nopaxos-05", "nopaxos-06", "nopaxos-07", "nopaxos-08", "nopaxos-09"]
+    configMap = {3: "config-3", 5: "config-5", 7: "config-7", 9: "config-9"} # TODO: add others
+    replicas = ["replica-1", "replica-2", "replica-3", "replica-4", "replica-5",
+            "replica-6", "replica-7", "replica-8", "replica-9"]
     clients = ["client", "client-2", "client-3"]
     config = configMap[numReplicas]
     sequencer = "sequencer"
@@ -59,7 +60,7 @@ def runTest(protocol, numReplicas, numThreadsPerClient, numClientMachines):
     for i in reversed(range(0, numClientMachines)):
         process = subprocess.Popen(generateCmdStr(clients[i], clientCmd),
             shell=True, stdout=subprocess.PIPE)
-        t = threading.Timer(300, timeout, [process])
+        t = threading.Timer(60, timeout, [process])
         t.start()
         timers.append(t)
         clientProcesses.append(process)
