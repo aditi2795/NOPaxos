@@ -23,7 +23,7 @@ def runTest(protocol, numReplicas, numThreadsPerClient, numClientMachines):
     configMap = {3: "config-3", 5: "config-5", 7: "config-7", 9: "config-9"} # TODO: add others
     replicas = ["replica-1", "replica-2", "replica-3", "replica-4", "replica-5",
             "replica-6", "replica-7", "replica-8", "replica-9"]
-    clients = ["client", "client-2", "client-3"]
+    clients = ["client", "client-2", "client-3", "client-4", "client-5"]
     config = configMap[numReplicas]
     sequencer = "sequencer"
     processes = []

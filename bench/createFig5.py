@@ -7,12 +7,12 @@ import os
 from runBench import runTest
 import matplotlib.pyplot as plt
 
-clientMachines = 3
+clientMachines = 5
 averageRuns = 1
 protocols = ["unreplicated", "vr", "batch", "fastpaxos", "nopaxos"]
 #protocols = ["unreplicated", "vr", "batch"]
 #protocols = ["nopaxos"]
-maxThreads = {"unreplicated": 12, "vr": 5, "batch": 25, "fastpaxos": 5,
+maxThreads = {"unreplicated": 12, "vr": 5, "batch": 25, "fastpaxos": 4,
         "nopaxos": 20}
 for protocol in protocols:
     throughputList = []
