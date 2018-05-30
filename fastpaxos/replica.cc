@@ -39,9 +39,9 @@
 
 #include <algorithm>
 
-#define RDebug(fmt, ...) Debug("[%d] " fmt, this->replicaIdx, ##__VA_ARGS__)
-#define RNotice(fmt, ...) Notice("[%d] " fmt, this->replicaIdx, ##__VA_ARGS__)
-#define RWarning(fmt, ...) Warning("[%d] " fmt, this->replicaIdx, ##__VA_ARGS__)
+#define RDebug(fmt, ...) //Debug("[%d] " fmt, this->replicaIdx, ##__VA_ARGS__)
+#define RNotice(fmt, ...) //Notice("[%d] " fmt, this->replicaIdx, ##__VA_ARGS__)
+#define RWarning(fmt, ...) //Warning("[%d] " fmt, this->replicaIdx, ##__VA_ARGS__)
 #define RPanic(fmt, ...) Panic("[%d] " fmt, this->replicaIdx, ##__VA_ARGS__)
 
 namespace specpaxos {
