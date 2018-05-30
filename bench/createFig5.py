@@ -8,8 +8,8 @@ from runBench import runTest
 import matplotlib.pyplot as plt
 
 clientMachines = 5
-averageRuns = 1
-protocols = ["unreplicated", "vr", "batch", "fastpaxos", "nopaxos"]
+averageRuns = 3
+protocols = ["nopaxos","unreplicated", "vr", "batch", "fastpaxos"]
 #protocols = ["unreplicated", "vr", "batch"]
 #protocols = ["nopaxos"]
 maxThreads = {"unreplicated": 12, "vr": 5, "batch": 25, "fastpaxos": 4,
