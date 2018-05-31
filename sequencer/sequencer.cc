@@ -118,7 +118,7 @@ Transport::Transport(Sequencer *sequencer, Configuration *config, specpaxos::Con
         Panic("Failed to bind socket");
     }
 
-    firstPacket = false;
+    firstPacket = true;
     packetCtr = 0;
 
     fprintf(stderr, "Transport setup complete.");
@@ -139,8 +139,6 @@ Transport::~Transport() {
     if (sockfd != -1) {
         close(sockfd);
     }
-    fprintf(stderr, "Start time is: %s", asctime(localtime(&first)));
-    fprintf(stderr, "End time is: %s", asctime(localtime(&last)));
 }
 
 void
@@ -159,11 +157,12 @@ Transport::Run() {
 	if (firstPacket) {
 	    firstPacket = false;
 	    gettimeofday(&first, NULL);
+	    fprintf(stderr, "starting val\n");
 	}
 	gettimeofday(&last, NULL);
         packetCtr++;
         if (packetCtr % 1000 == 0) {
-            fprintf(stderr, "Elapsed time in us: %s", last.tv_usec - first.tv_usec);
+            printf("%f\n", (double)(last.tv_sec - first.tv_sec + (last.tv_usec - first.tv_usec) / 1000000.0));
         }
 
         if (n <= 0) {

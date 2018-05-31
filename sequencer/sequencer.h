@@ -89,8 +89,8 @@ private:
     specpaxos::Configuration *global_config;
     int sockfd;
     struct ifreq ifopts;
-    struct timespec first;
-    struct timespec last;
+    struct timeval first;
+    struct timeval last;
     bool firstPacket;
     int packetCtr;
 
