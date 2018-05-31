@@ -42,7 +42,7 @@
 #include <sys/socket.h>
 #include <net/if.h>
 #include <netinet/ether.h>
-#include <time.h>
+#include <sys/time.h>
 
 #include <unordered_map>
 
@@ -89,8 +89,8 @@ private:
     specpaxos::Configuration *global_config;
     int sockfd;
     struct ifreq ifopts;
-    time_t first;
-    time_t last;
+    struct timespec first;
+    struct timespec last;
     bool firstPacket;
     int packetCtr;
 

@@ -33,7 +33,7 @@
 #include "lib/message.h"
 #include "lib/configuration.h"
 #include "sequencer/sequencer.h"
-#include <time.h>
+#include <sys/time.h>
 
 using namespace std;
 
@@ -158,14 +158,13 @@ Transport::Run() {
 
 	if (firstPacket) {
 	    firstPacket = false;
-	    time(&first);
-        fprintf(stderr, "Start time is: %s", asctime(localtime(&first)));
+	    gettimeofday(&first, NULL);
 	}
-	time(&last);
-    packetCtr++;
-    if (packetCtr % 1000 == 0) {
-        fprintf(stderr, "End time is: %s", asctime(localtime(&last)));
-    }
+	gettimeofday(&last, NULL);
+        packetCtr++;
+        if (packetCtr % 1000 == 0) {
+            fprintf(stderr, "Elapsed time in us: %s", last.tv_usec - first.tv_usec);
+        }
 
         if (n <= 0) {
             break;
