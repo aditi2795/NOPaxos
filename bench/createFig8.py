@@ -20,7 +20,7 @@ for protocol in protocols:
     for numReplicas in numReplicasList:
         avgThroughput = 0
         for i in range(averageRuns):
-            throughput, latency = runTest(protocol, numReplicas,
+            throughput, latency,_ = runTest(protocol, numReplicas,
                     maxThreads[protocol], clientMachines)
             if throughput == -1 and latency == -1:
                 continue

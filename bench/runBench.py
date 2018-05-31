@@ -6,6 +6,7 @@ import subprocess
 import os
 import threading
 import time
+import tempfile
 
 project = "nopaxos-204404"
 zone="us-west1-a"
@@ -30,12 +31,13 @@ def runTest(protocol, numReplicas, numThreadsPerClient, numClientMachines):
     devNull = open(os.devnull, 'w')
 
     # Start sequencer for nopaxos
-#    if protocol == "nopaxos":
-#        sequencerCmd = ("sudo kill \$(ps aux | grep 'sequencer' | grep -v grep | awk '{print \$2}'); cd /home/emmadauterman/NOPaxos; sudo ./sequencer/sequencer -C %s -c sequencer_config") % config
-#        process = subprocess.Popen(generateCmdStr(sequencer, sequencerCmd),
-#            shell=True) 
-#        processes.append(process)
-#        time.sleep(0.5)
+    tempFile = tempfile.TemporaryFile()
+    if protocol == "nopaxos":
+        sequencerCmd = ("sudo kill \$(ps aux | grep 'sequencer' | grep -v grep | awk '{print \$2}'); cd /home/emmadauterman/NOPaxos; sudo ./sequencer/sequencer -C %s -c sequencer_config") % config
+        process = subprocess.Popen(generateCmdStr(sequencer, sequencerCmd),
+            stderr=tempFile, shell=True) 
+        processes.append(process)
+        time.sleep(0.5)
 
     # Start replicas
     for i in range(0, numReplicas):
@@ -85,9 +87,24 @@ def runTest(protocol, numReplicas, numThreadsPerClient, numClientMachines):
     for t in timers:
         t.cancel()
 
+    seqThroughput = 0
+    if protocol == "nopaxos":
+        tempFile.seek(0)
+        lines = tempFile.readlines()
+        print lines
+        start = float(lines[0])
+        end = float(lines[len(lines) - 1])
+        print "Start is %f and end is %f" % (start, end)
+        elapsed = end - start
+        seqThroughput = numClientMachines * numThreadsPerClient * 1000.0 / elapsed
+        print "Sequencer Throughput is %f" % seqThroughput
+
+
     print ""
     print "******************************************************************"
     print ("Finished running %s with %d replicas with %d client machines each running %d threads") % (protocol, numReplicas, numClientMachines, numThreadsPerClient)
     print ("Total throughput (requests/sec): %d") % (totThroughput)
     print ("Average latency (us): %d") % (avgLatency)
-    return totThroughput, avgLatency
+    if protocol == "nopaxos":
+        print "Sequencer Throughput is %f" % seqThroughput
+    return totThroughput, avgLatency, seqThroughput
