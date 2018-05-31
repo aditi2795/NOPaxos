@@ -14,8 +14,7 @@ legend = {"nopaxos": "NOPaxos", "unreplicated": "Unreplicated", "vr": "Paxos", "
 protocols = ["nopaxos","unreplicated", "vr", "batch", "fastpaxos"]
 #protocols = ["unreplicated", "vr", "batch"]
 #protocols = ["nopaxos"]
-maxThreads = {"unreplicated": 12, "vr": 5, "batch": 25, "fastpaxos": 4,
-        "nopaxos": 20}
+maxThreads = {"unreplicated": 12, "vr": 5, "batch": 25, "fastpaxos": 4, "nopaxos": 20}
 for protocol in protocols:
     throughputList = []
     latencyList = []
