@@ -121,8 +121,6 @@ Transport::Transport(Sequencer *sequencer, Configuration *config, specpaxos::Con
     firstPacket = true;
     packetCtr = 0;
 
-    fprintf(stderr, "Transport setup complete.");
-
     /* Sequencer sends out packets using multicast */
     /*for (int i = 0; i < config->g; i++) {
 	for (int j = 0; j < config->n; j++) {
@@ -157,12 +155,11 @@ Transport::Run() {
 	if (firstPacket) {
 	    firstPacket = false;
 	    gettimeofday(&first, NULL);
-	    fprintf(stderr, "starting val\n");
 	}
 	gettimeofday(&last, NULL);
         packetCtr++;
         if (packetCtr % 1000 == 0) {
-            printf("%f\n", (double)(last.tv_sec - first.tv_sec + (last.tv_usec - first.tv_usec) / 1000000.0));
+            fprintf(stderr, "%f\n", (double)(last.tv_sec - first.tv_sec + (last.tv_usec - first.tv_usec) / 1000000.0));
         }
 
         if (n <= 0) {
