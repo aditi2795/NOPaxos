@@ -6,6 +6,7 @@ import subprocess
 import os
 from runBench import runTest
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FormatStrFormatter
 
 clientMachines = 5
 averageRuns = 3
@@ -29,13 +30,18 @@ for protocol in protocols:
             avgLatency += latency
         if avgThroughput == 0 and avgLatency == 0:
             continue
-        avgThroughput /= float(averageRuns) 
+        avgThroughput /= float(averageRuns)
+        # change units to thousands
+        avgThroughput /= 1000
         avgLatency /= float(averageRuns)
         throughputList.append(avgThroughput)
         latencyList.append(avgLatency)
     plt.plot(throughputList, latencyList, 'o', label=protocol)
 plt.legend()
-plt.xlabel("Throughput")
-plt.ylabel("Latency")
+plt.xlabel("Throughput (ops/sec)")
+plt.xlim([0, 200])
+plt.gca().xaxis.set_major_formatter(FormatStrFormatter('%dK'))
+plt.ylabel("Latency (microsec)")
+plt.title("NOPAXOS Figure 5 replication")
 plt.savefig('Figure5.png')
 

@@ -25,7 +25,7 @@ def runTest(protocol, numReplicas, numThreadsPerClient, numClientMachines):
             "replica-6", "replica-7", "replica-8", "replica-9"]
     clients = ["client", "client-2", "client-3", "client-4", "client-5"]
     config = configMap[numReplicas]
-    sequencer = "sequencer"
+    sequencer = "fast-sequencer"
     processes = []
     devNull = open(os.devnull, 'w')
 
