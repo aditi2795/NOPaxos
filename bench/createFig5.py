@@ -10,6 +10,7 @@ from matplotlib.ticker import FormatStrFormatter
 
 clientMachines = 5
 averageRuns = 3
+legend = {"nopaxos": "NOPaxos", "unreplicated": "Unreplicated", "vr": "Paxos", "batch": "Batching", "fastpaxos": "Fast Paxos"}
 protocols = ["nopaxos","unreplicated", "vr", "batch", "fastpaxos"]
 #protocols = ["unreplicated", "vr", "batch"]
 #protocols = ["nopaxos"]
@@ -36,7 +37,7 @@ for protocol in protocols:
         avgLatency /= float(averageRuns)
         throughputList.append(avgThroughput)
         latencyList.append(avgLatency)
-    plt.plot(throughputList, latencyList, 'o', label=protocol)
+    plt.plot(throughputList, latencyList, 'o', label=legend[protocol])
 plt.legend()
 plt.xlabel("Throughput (ops/sec)")
 plt.xlim([0, 200])
