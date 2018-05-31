@@ -7,12 +7,14 @@ import os
 from runBench import runTest
 import matplotlib.pyplot as plt
 
-clientMachines = 3
-averageRuns = 1
-protocols = ["unreplicated", "vr", "batch", "fastpaxos", "nopaxos"]
+clientMachines = 5
+averageRuns = 1 
+#protocols = ["unreplicated", "vr", "batch", "fastpaxos", "nopaxos"]
+protocols = ["nopaxos"]
 maxThreads = {"unreplicated": 12, "vr": 5, "batch": 20, "fastpaxos": 4,
         "nopaxos": 12}
-numReplicasList = [3, 5, 7, 9]
+#numReplicasList = [3, 5, 7, 9]
+numReplicasList = [7]
 for protocol in protocols:
     throughputList = []
     for numReplicas in numReplicasList:

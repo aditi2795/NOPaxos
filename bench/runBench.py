@@ -30,12 +30,12 @@ def runTest(protocol, numReplicas, numThreadsPerClient, numClientMachines):
     devNull = open(os.devnull, 'w')
 
     # Start sequencer for nopaxos
-    if protocol == "nopaxos":
-        sequencerCmd = ("sudo kill \$(ps aux | grep 'sequencer' | grep -v grep | awk '{print \$2}'); cd /home/emmadauterman/NOPaxos; sudo ./sequencer/sequencer -C %s -c sequencer_config") % config
-        process = subprocess.Popen(generateCmdStr(sequencer, sequencerCmd),
-            shell=True) 
-        processes.append(process)
-        time.sleep(0.5)
+#    if protocol == "nopaxos":
+#        sequencerCmd = ("sudo kill \$(ps aux | grep 'sequencer' | grep -v grep | awk '{print \$2}'); cd /home/emmadauterman/NOPaxos; sudo ./sequencer/sequencer -C %s -c sequencer_config") % config
+#        process = subprocess.Popen(generateCmdStr(sequencer, sequencerCmd),
+#            shell=True) 
+#        processes.append(process)
+#        time.sleep(0.5)
 
     # Start replicas
     for i in range(0, numReplicas):

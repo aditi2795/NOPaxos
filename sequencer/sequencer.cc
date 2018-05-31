@@ -159,8 +159,13 @@ Transport::Run() {
 	if (firstPacket) {
 	    firstPacket = false;
 	    time(&first);
+        fprintf(stderr, "Start time is: %s", asctime(localtime(&first)));
 	}
 	time(&last);
+    packetCtr++;
+    if (packetCtr % 1000 == 0) {
+        fprintf(stderr, "End time is: %s", asctime(localtime(&last)));
+    }
 
         if (n <= 0) {
             break;
