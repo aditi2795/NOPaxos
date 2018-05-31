@@ -42,6 +42,7 @@
 #include <sys/socket.h>
 #include <net/if.h>
 #include <netinet/ether.h>
+#include <time.h>
 
 #include <unordered_map>
 
@@ -88,6 +89,10 @@ private:
     specpaxos::Configuration *global_config;
     int sockfd;
     struct ifreq ifopts;
+    time_t first;
+    time_t last;
+    bool firstPacket;
+    int packetCtr;
 
     void SetPacketDest(uint8_t *packet, specpaxos::ReplicaAddress *replica);
     void SetOuterPacketDestSrc(uint8_t *packet, specpaxos::ReplicaAddress *replica);

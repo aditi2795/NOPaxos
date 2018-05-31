@@ -33,6 +33,7 @@
 #include "lib/message.h"
 #include "lib/configuration.h"
 #include "sequencer/sequencer.h"
+#include <time.h>
 
 using namespace std;
 
@@ -117,6 +118,9 @@ Transport::Transport(Sequencer *sequencer, Configuration *config, specpaxos::Con
         Panic("Failed to bind socket");
     }
 
+    firstPacket = false;
+    packetCtr = 0;
+
     fprintf(stderr, "Transport setup complete.");
 
     /* Sequencer sends out packets using multicast */
@@ -135,6 +139,8 @@ Transport::~Transport() {
     if (sockfd != -1) {
         close(sockfd);
     }
+    fprintf(stderr, "Start time is: %s", asctime(localtime(&first)));
+    fprintf(stderr, "End time is: %s", asctime(localtime(&last)));
 }
 
 void
@@ -149,6 +155,12 @@ Transport::Run() {
 
     while (true) {
         n = recvfrom(this->sockfd, buffer, BUFFER_SIZE, 0, nullptr, nullptr);
+
+	if (firstPacket) {
+	    firstPacket = false;
+	    time(&first);
+	}
+	time(&last);
 
         if (n <= 0) {
             break;
