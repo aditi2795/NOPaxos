@@ -33,7 +33,7 @@
 #include "lib/message.h"
 #include "lib/configuration.h"
 #include "sequencer/sequencer.h"
-#include <time.h>
+#include <sys/time.h>
 
 using namespace std;
 
@@ -118,10 +118,8 @@ Transport::Transport(Sequencer *sequencer, Configuration *config, specpaxos::Con
         Panic("Failed to bind socket");
     }
 
-    firstPacket = false;
+    firstPacket = true;
     packetCtr = 0;
-
-    fprintf(stderr, "Transport setup complete.");
 
     /* Sequencer sends out packets using multicast */
     /*for (int i = 0; i < config->g; i++) {
@@ -139,8 +137,6 @@ Transport::~Transport() {
     if (sockfd != -1) {
         close(sockfd);
     }
-    fprintf(stderr, "Start time is: %s", asctime(localtime(&first)));
-    fprintf(stderr, "End time is: %s", asctime(localtime(&last)));
 }
 
 void
@@ -158,14 +154,13 @@ Transport::Run() {
 
 	if (firstPacket) {
 	    firstPacket = false;
-	    time(&first);
-        fprintf(stderr, "Start time is: %s", asctime(localtime(&first)));
+	    gettimeofday(&first, NULL);
 	}
-	time(&last);
-    packetCtr++;
-    if (packetCtr % 1000 == 0) {
-        fprintf(stderr, "End time is: %s", asctime(localtime(&last)));
-    }
+	gettimeofday(&last, NULL);
+        packetCtr++;
+        if (packetCtr % 1000 == 0) {
+            fprintf(stderr, "%f\n", (double)(last.tv_sec - first.tv_sec + (last.tv_usec - first.tv_usec) / 1000000.0));
+        }
 
         if (n <= 0) {
             break;
