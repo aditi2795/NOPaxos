@@ -12,8 +12,6 @@ clientMachines = 5
 averageRuns = 3
 legend = {"nopaxos": "NOPaxos", "unreplicated": "Unreplicated", "vr": "Paxos", "batch": "Batching", "fastpaxos": "Fast Paxos"}
 protocols = ["nopaxos","unreplicated", "vr", "batch", "fastpaxos"]
-#protocols = ["unreplicated", "vr", "batch"]
-#protocols = ["nopaxos"]
 maxThreads = {"unreplicated": 12, "vr": 5, "batch": 25, "fastpaxos": 4, "nopaxos": 20}
 for protocol in protocols:
     throughputList = []
@@ -22,8 +20,7 @@ for protocol in protocols:
         avgThroughput = 0
         avgLatency = 0
         for i in range(averageRuns):
-            throughput, latency,_ = runTest(protocol, 5, threads, clientMachines)
-            #change to 5 for real testing!
+            throughput, latency,_ = runTest(protocol, 3, threads, clientMachines)
             if throughput == -1 and latency == -1:
                 continue
             avgThroughput += throughput
@@ -42,6 +39,6 @@ plt.xlabel("Throughput (ops/sec)")
 plt.xlim([0, 200])
 plt.gca().xaxis.set_major_formatter(FormatStrFormatter('%dK'))
 plt.ylabel("Latency (microsec)")
-plt.title("NOPAXOS Figure 5 replication")
-plt.savefig('Figure5.png')
+plt.title("NOPAXOS Figure 5 replication (3 replicas)")
+plt.savefig('Figure5-3.png')
 
