@@ -33,7 +33,7 @@ def runTest(protocol, numReplicas, numThreadsPerClient, numClientMachines):
     # Start sequencer for nopaxos
     tempFile = tempfile.TemporaryFile()
     if protocol == "nopaxos":
-        sequencerCmd = ("sudo kill \$(ps aux | grep 'sequencer' | grep -v grep | awk '{print \$2}'); cd /home/emmadauterman/NOPaxos; sudo ./sequencer/sequencer -C %s -c sequencer_config") % config
+        sequencerCmd = ("sudo kill \$(ps aux | grep 'sequencer' | grep -v grep | awk '{print \$2}') > /dev/null &> /dev/null; cd /home/emmadauterman/NOPaxos; sudo ./sequencer/sequencer -C %s -c sequencer_config") % config
         process = subprocess.Popen(generateCmdStr(sequencer, sequencerCmd),
             stderr=tempFile, shell=True) 
         processes.append(process)
@@ -44,9 +44,9 @@ def runTest(protocol, numReplicas, numThreadsPerClient, numClientMachines):
         protocolStr = protocol
         if protocol == "batch":
             protocolStr = "vr -b 100"
-        replicaCmd = ("sudo lsof -t -i udp:8000 | sudo xargs kill; cd /home/emmadauterman/NOPaxos; ./bench/replica -c %s -i %d -m %s") % (config, i, protocolStr)
+        replicaCmd = ("sudo lsof -t -i udp:8000 | sudo xargs kill > /dev/null &> /dev/null; cd /home/emmadauterman/NOPaxos; ./bench/replica -c %s -i %d -m %s") % (config, i, protocolStr)
         process = subprocess.Popen(generateCmdStr(replicas[i], replicaCmd),
-            shell=True)
+            shell=True, stdout=devNull)
         processes.append(process)
         time.sleep(0.5)
 
@@ -91,13 +91,10 @@ def runTest(protocol, numReplicas, numThreadsPerClient, numClientMachines):
     if protocol == "nopaxos":
         tempFile.seek(0)
         lines = tempFile.readlines()
-        print lines
         start = float(lines[0])
         end = float(lines[len(lines) - 1])
-        print "Start is %f and end is %f" % (start, end)
         elapsed = end - start
         seqThroughput = numClientMachines * numThreadsPerClient * 1000.0 / elapsed
-        print "Sequencer Throughput is %f" % seqThroughput
 
 
     print ""

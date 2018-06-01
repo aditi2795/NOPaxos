@@ -9,31 +9,37 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
 
 clientMachines = 5
-averageRuns = 3
+averageRuns = 10
 legend = {"nopaxos": "NOPaxos", "unreplicated": "Unreplicated", "vr": "Paxos", "batch": "Batching", "fastpaxos": "Fast Paxos"}
 protocols = ["nopaxos","unreplicated", "vr", "batch", "fastpaxos"]
-maxThreads = {"unreplicated": 12, "vr": 5, "batch": 25, "fastpaxos": 4, "nopaxos": 20}
+#maxThreads = {"unreplicated": 25, "vr": 5, "batch": 25, "fastpaxos": 4, "nopaxos": 20}
+#stepSize = {"unreplicated": 3, "vr": 1, "batch": 3, "fastpaxos": 1, "nopaxos": 3}
+threadRanges = {"unreplicated": range(1, 6, 1) + range(6, 25, 3), "vr": range(1,
+    5), "batch": range(1, 25, 3), "fastpaxos": range(1, 4), "nopaxos": range(1, 20, 3)}
 for protocol in protocols:
     throughputList = []
     latencyList = []
-    for threads in range(1, maxThreads[protocol]):
+    for threads in threadRanges[protocol]:
         avgThroughput = 0
         avgLatency = 0
+        totRuns = 0
         for i in range(averageRuns):
             throughput, latency,_ = runTest(protocol, 3, threads, clientMachines)
             if throughput == -1 and latency == -1:
                 continue
+            totRuns += 1
             avgThroughput += throughput
             avgLatency += latency
         if avgThroughput == 0 and avgLatency == 0:
             continue
-        avgThroughput /= float(averageRuns)
+        avgThroughput /= float(totRuns)
         # change units to thousands
         avgThroughput /= 1000
-        avgLatency /= float(averageRuns)
+        avgLatency /= float(totRuns)
         throughputList.append(avgThroughput)
         latencyList.append(avgLatency)
-    plt.plot(throughputList, latencyList, 'o', label=legend[protocol])
+    plt.plot(throughputList, latencyList, label=legend[protocol], linestyle='-',
+            marker='o')
 plt.legend()
 plt.xlabel("Throughput (ops/sec)")
 plt.xlim([0, 200])
