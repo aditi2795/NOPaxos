@@ -14,4 +14,4 @@ python createFig8.py
 echo "-----------------------------------"
 echo "------ Measure Bottleneck - -------"
 echo "-----------------------------------"
-python measureBottleneck.py
+python createBottleneckCheck.py

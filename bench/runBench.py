@@ -35,7 +35,7 @@ def runTest(protocol, numReplicas, numThreadsPerClient, numClientMachines):
     if protocol == "nopaxos":
         sequencerCmd = ("sudo kill \$(ps aux | grep 'sequencer' | grep -v grep | awk '{print \$2}') > /dev/null &> /dev/null; cd /home/emmadauterman/NOPaxos; sudo ./sequencer/sequencer -C %s -c sequencer_config") % config
         process = subprocess.Popen(generateCmdStr(sequencer, sequencerCmd),
-            stderr=tempFile, shell=True) 
+            stderr=tempFile, stdout=devNull, shell=True) 
         processes.append(process)
         time.sleep(0.5)
 
@@ -46,7 +46,7 @@ def runTest(protocol, numReplicas, numThreadsPerClient, numClientMachines):
             protocolStr = "vr -b 100"
         replicaCmd = ("sudo lsof -t -i udp:8000 | sudo xargs kill > /dev/null &> /dev/null; cd /home/emmadauterman/NOPaxos; ./bench/replica -c %s -i %d -m %s") % (config, i, protocolStr)
         process = subprocess.Popen(generateCmdStr(replicas[i], replicaCmd),
-            shell=True, stdout=devNull)
+            shell=True, stdout=devNull, stderr=devNull)
         processes.append(process)
         time.sleep(0.5)
 
@@ -61,7 +61,7 @@ def runTest(protocol, numReplicas, numThreadsPerClient, numClientMachines):
     totLatency = 0.0
     for i in reversed(range(0, numClientMachines)):
         process = subprocess.Popen(generateCmdStr(clients[i], clientCmd),
-            shell=True, stdout=subprocess.PIPE)
+            shell=True, stdout=subprocess.PIPE, stderr=devNull)
         t = threading.Timer(60, timeout, [process])
         t.start()
         timers.append(t)
