@@ -1,4 +1,5 @@
 # Generate all figures
+start=$(date)
 echo "-----------------------------------"
 echo "------ Figure 5, 3 replicas -------"
 echo "-----------------------------------"
@@ -15,3 +16,7 @@ echo "-----------------------------------"
 echo "------ Measure Bottleneck - -------"
 echo "-----------------------------------"
 python createBottleneckCheck.py
+echo "START"
+echo $start
+echo "END"
+date

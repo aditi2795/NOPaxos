@@ -43,7 +43,7 @@ def runTest(protocol, numReplicas, numThreadsPerClient, numClientMachines):
     for i in range(0, numReplicas):
         protocolStr = protocol
         if protocol == "batch":
-            protocolStr = "vr -b 100"
+            protocolStr = "vr -b 64"
         replicaCmd = ("sudo lsof -t -i udp:8000 | sudo xargs kill > /dev/null &> /dev/null; cd /home/emmadauterman/NOPaxos; ./bench/replica -c %s -i %d -m %s") % (config, i, protocolStr)
         process = subprocess.Popen(generateCmdStr(replicas[i], replicaCmd),
             shell=True, stdout=devNull, stderr=devNull)
