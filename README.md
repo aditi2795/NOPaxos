@@ -14,6 +14,6 @@ git clone https://github.com/edauterman/NOPaxos.git
 cd NOPaxos
 make PARANOID=0
 ~~~~ 
-You will need to modify the configuration files (config-3, config-5, config-7, config-9, sequencer_config) to use the correct IP and MAC addresses and change the bench/runBench.py to ssh into the correct machines.
+You will need to modify the configuration files (config-3, config-5, config-7, config-9, sequencer_config) to use the correct IP and MAC addresses and change bench/runBench.py to ssh into the correct machines.
 
 
