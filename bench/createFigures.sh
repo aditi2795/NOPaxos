@@ -1,5 +1,4 @@
 # Generate all figures
-start=$(date)
 echo "-----------------------------------"
 echo "------ Figure 5, 3 replicas -------"
 echo "-----------------------------------"
@@ -16,7 +15,7 @@ echo "-----------------------------------"
 echo "------ Measure Bottleneck - -------"
 echo "-----------------------------------"
 python createBottleneckCheck.py
-echo "START"
-echo $start
-echo "END"
-date
+echo ""
+echo "-----------------------------------"
+echo "TESTS COMPLETED"
+echo "Figure5-3.png, Figure5-5.png, Figure8.png, and SeqBottleneck.png generated in current working directory."
